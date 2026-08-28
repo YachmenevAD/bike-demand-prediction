@@ -1,26 +1,12 @@
-train_records = [
-    {"timestamp": "2024-01-01 06:00", "temperature": 8.1, "rentals": 16},
-    {"timestamp": "2024-01-01 07:00", "temperature": 8.7, "rentals": 20},
-    {"timestamp": "2024-01-01 08:00", "temperature": 9.4, "rentals": 35},
-    {"timestamp": "2024-01-01 17:00", "temperature": 13.2, "rentals": 42},
-    {"timestamp": "2024-01-01 18:00", "temperature": 12.5, "rentals": 38},
-    {"timestamp": "2024-01-01 19:00", "temperature": 11.7, "rentals": 29},
-]
-
-validation_records = [
-    {"timestamp": "2024-01-02 07:00", "temperature": 9.0, "rentals": 24},
-    {"timestamp": "2024-01-02 08:00", "temperature": 10.1, "rentals": 40},
-    {"timestamp": "2024-01-02 18:00", "temperature": 12.0, "rentals": 31},
-]
+import pandas as pd
 
 
-def calculate_mean_rentals(records: list[dict]) -> float:
-    total = 0
+DATA_PATH = "data/sample/bike_rentals.csv"
+VALIDATION_START = pd.Timestamp("2024-01-02 00:00:00")
 
-    for record in records:
-        total += record["rentals"]
 
-    return total / len(records)
+def calculate_mean_rentals(data: pd.DataFrame) -> float:
+    return float(data["rentals"].mean())
 
 def calculate_mae(
     actual: list[int],
@@ -38,16 +24,39 @@ def calculate_mae(
 
 
 def main() -> None:
-    baseline_prediction = calculate_mean_rentals(train_records)
+    data = pd.read_csv(
+        DATA_PATH,
+        parse_dates=["timestamp"],
+    )
 
-    actual = [record["rentals"] for record in validation_records]
+    data = data.sort_values("timestamp")
+
+    train_mask = data["timestamp"] < VALIDATION_START
+    validation_mask = data["timestamp"] >= VALIDATION_START
+
+    train_data = data.loc[train_mask]
+    validation_data = data.loc[validation_mask]
+
+    if train_data.empty or validation_data.empty:
+        raise ValueError("Train and validation datasets must not be empty")
+
+    baseline_prediction = calculate_mean_rentals(train_data)
+
+    actual = validation_data["rentals"].tolist()
     predicted = [
         baseline_prediction
-        for _ in validation_records
+        for _ in actual
     ]
 
     mae = calculate_mae(actual, predicted)
 
+    print(f"Train rows: {len(train_data)}")
+    print(f"Validation rows: {len(validation_data)}")
+    print(f"Last train timestamp: {train_data['timestamp'].max()}")
+    print(
+        "First validation timestamp: "
+        f"{validation_data['timestamp'].min()}"
+    )
     print(f"Baseline prediction: {baseline_prediction:.1f}")
     print(f"Validation actual: {actual}")
     print(f"Validation predicted: {predicted}")
