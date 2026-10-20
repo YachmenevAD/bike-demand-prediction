@@ -219,3 +219,6 @@ __marimo__/
 
 # Downloaded datasets
 /data/raw/
+
+# Model artifacts
+/artifacts/
