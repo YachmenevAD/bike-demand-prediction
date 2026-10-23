@@ -15,7 +15,7 @@ app = FastAPI(
 
 
 class BikeDemandRequest(BaseModel):
-    season: int = Field(..., ge=1, le=4, description="Season (1: winter ... 4: fall)")
+    season: int = Field(..., ge=1, le=4, description="Season (1: spring, 2: summer, 3: fall, 4: winter)")
     mnth: int = Field(..., ge=1, le=12, description="Month (1 to 12)")
     hr: int = Field(..., ge=0, le=23, description="Hour of the day (0 to 23)")
     weekday: int = Field(..., ge=0, le=6, description="Day of week (0 to 6)")
