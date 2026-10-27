@@ -3,11 +3,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 from zipfile import ZipFile
 
-
-DATA_URL = (
-    "https://archive.ics.uci.edu/static/public/275/"
-    "bike+sharing+dataset.zip"
-)
+DATA_URL = "https://archive.ics.uci.edu/static/public/275/bike+sharing+dataset.zip"
 OUTPUT_PATH = Path("data/raw/hour.csv")
 ARCHIVE_FILE_NAME = "hour.csv"
 
