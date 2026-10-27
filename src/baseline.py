@@ -1,12 +1,12 @@
 import pandas as pd
 
-
 DATA_PATH = "data/sample/bike_rentals.csv"
 VALIDATION_START = pd.Timestamp("2024-01-02 00:00:00")
 
 
 def calculate_mean_rentals(data: pd.DataFrame) -> float:
     return float(data["rentals"].mean())
+
 
 def calculate_mae(
     actual: list[int],
@@ -43,20 +43,14 @@ def main() -> None:
     baseline_prediction = calculate_mean_rentals(train_data)
 
     actual = validation_data["rentals"].tolist()
-    predicted = [
-        baseline_prediction
-        for _ in actual
-    ]
+    predicted = [baseline_prediction for _ in actual]
 
     mae = calculate_mae(actual, predicted)
 
     print(f"Train rows: {len(train_data)}")
     print(f"Validation rows: {len(validation_data)}")
     print(f"Last train timestamp: {train_data['timestamp'].max()}")
-    print(
-        "First validation timestamp: "
-        f"{validation_data['timestamp'].min()}"
-    )
+    print(f"First validation timestamp: {validation_data['timestamp'].min()}")
     print(f"Baseline prediction: {baseline_prediction:.1f}")
     print(f"Validation actual: {actual}")
     print(f"Validation predicted: {predicted}")

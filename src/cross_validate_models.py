@@ -13,7 +13,6 @@ from src.train_real_models import (
     build_random_forest_pipeline,
 )
 
-
 N_SPLITS = 3
 VALIDATION_WINDOW_SIZE = 24 * 30
 
@@ -22,9 +21,7 @@ def main() -> None:
     data = load_hourly_data()
 
     # Test data must not participate in model selection.
-    development_data = data.loc[
-        data["timestamp"] < TEST_START
-    ].copy()
+    development_data = data.loc[data["timestamp"] < TEST_START].copy()
     development_data = development_data.reset_index(drop=True)
 
     X, y = select_features_and_target(development_data)
@@ -40,10 +37,7 @@ def main() -> None:
         "RandomForestRegressor": build_random_forest_pipeline(),
     }
 
-    scores: dict[str, list[float]] = {
-        name: []
-        for name in models
-    }
+    scores: dict[str, list[float]] = {name: [] for name in models}
 
     for fold_number, (train_indices, validation_indices) in enumerate(
         splitter.split(X),
@@ -55,26 +49,19 @@ def main() -> None:
         X_fold_validation = X.iloc[validation_indices]
         y_fold_validation = y.iloc[validation_indices]
 
-        validation_start = development_data.iloc[
-            validation_indices[0]
-        ]["timestamp"]
-        validation_end = development_data.iloc[
-            validation_indices[-1]
-        ]["timestamp"]
+        validation_start = development_data.iloc[validation_indices[0]]["timestamp"]
+        validation_end = development_data.iloc[validation_indices[-1]]["timestamp"]
 
         print(
             f"\nFold {fold_number}: "
             f"{len(train_indices)} train rows, "
             f"{len(validation_indices)} validation rows"
         )
-        print(
-            f"Validation period: "
-            f"{validation_start} -> {validation_end}"
-        )
+        print(f"Validation period: {validation_start} -> {validation_end}")
 
         for model_name, model in models.items():
             fold_model = clone(model)
-            fold_model.fit(X_fold_train,y_fold_train)
+            fold_model.fit(X_fold_train, y_fold_train)
             predictions = fold_model.predict(X_fold_validation)
             fold_mae = mean_absolute_error(
                 y_fold_validation,

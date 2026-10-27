@@ -8,7 +8,6 @@ from src.real_features import (
 )
 from src.train_real_models import build_random_forest_pipeline
 
-
 N_ESTIMATORS = 150
 MIN_SAMPLES_LEAF = 1
 MAX_DEPTH = None
@@ -18,14 +17,11 @@ def summarize_errors(
     results: pd.DataFrame,
     group_column: str,
 ) -> pd.DataFrame:
-    return (
-        results.groupby(group_column, as_index=False)
-        .agg(
-            observations=("absolute_error", "size"),
-            actual_mean=("actual", "mean"),
-            prediction_mean=("prediction", "mean"),
-            mae=("absolute_error", "mean"),
-        )
+    return results.groupby(group_column, as_index=False).agg(
+        observations=("absolute_error", "size"),
+        actual_mean=("actual", "mean"),
+        prediction_mean=("prediction", "mean"),
+        mae=("absolute_error", "mean"),
     )
 
 
@@ -34,9 +30,7 @@ def main() -> None:
     train_data, validation_data, _ = split_by_time(data)
 
     X_train, y_train = select_features_and_target(train_data)
-    X_validation, y_validation = select_features_and_target(
-        validation_data
-    )
+    X_validation, y_validation = select_features_and_target(validation_data)
 
     model = build_random_forest_pipeline()
     model.set_params(
@@ -62,9 +56,7 @@ def main() -> None:
         ]
     ].copy()
 
-    results = results.rename(
-        columns={TARGET_COLUMN: "actual"}
-    )
+    results = results.rename(columns={TARGET_COLUMN: "actual"})
     results["prediction"] = predictions
     results["error"] = results["prediction"] - results["actual"]
     results["absolute_error"] = results["error"].abs()
@@ -79,38 +71,20 @@ def main() -> None:
     weather_summary = summarize_errors(results, "weathersit")
     month_summary = summarize_errors(results, "mnth")
 
-    hours_with_highest_error = (
-        hour_summary
-        .sort_values("mae", ascending=False)
-        .head(5)
-    )
+    hours_with_highest_error = hour_summary.sort_values("mae", ascending=False).head(5)
 
     print(f"Validation rows: {len(results)}")
     print(f"Validation MAE: {validation_mae:.2f}")
     print(f"Mean signed error: {mean_signed_error:.2f}")
 
     print("\nFive hours with highest MAE:")
-    print(
-        hours_with_highest_error
-        .round(2)
-        .to_string(index=False)
-    )
+    print(hours_with_highest_error.round(2).to_string(index=False))
 
     print("\nErrors by weather category:")
-    print(
-        weather_summary
-        .sort_values("weathersit")
-        .round(2)
-        .to_string(index=False)
-    )
+    print(weather_summary.sort_values("weathersit").round(2).to_string(index=False))
 
     print("\nErrors by month:")
-    print(
-        month_summary
-        .sort_values("mnth")
-        .round(2)
-        .to_string(index=False)
-    )
+    print(month_summary.sort_values("mnth").round(2).to_string(index=False))
 
 
 if __name__ == "__main__":

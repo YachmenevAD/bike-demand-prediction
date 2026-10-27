@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 DATA_PATH = Path("data/raw/hour.csv")
 
 EXPECTED_COLUMNS = [
@@ -59,10 +58,7 @@ def main() -> None:
     duplicate_timestamps = int(data["timestamp"].duplicated().sum())
 
     target_identity_violations = int(
-        (
-            data[TARGET_COLUMN]
-            != data["casual"] + data["registered"]
-        ).sum()
+        (data[TARGET_COLUMN] != data["casual"] + data["registered"]).sum()
     )
 
     print(f"Raw dataset shape: ({len(data)}, {len(EXPECTED_COLUMNS)})")
@@ -73,19 +69,13 @@ def main() -> None:
     print("\nTime range:")
     print(f"Start: {data['timestamp'].min()}")
     print(f"End: {data['timestamp'].max()}")
-    print(
-        "Chronological order: "
-        f"{data['timestamp'].is_monotonic_increasing}"
-    )
+    print(f"Chronological order: {data['timestamp'].is_monotonic_increasing}")
 
     print("\nData quality:")
     print(f"Missing values: {total_missing_values}")
     print(f"Duplicate rows: {duplicate_rows}")
     print(f"Duplicate timestamps: {duplicate_timestamps}")
-    print(
-        "Target identity violations: "
-        f"{target_identity_violations}"
-    )
+    print(f"Target identity violations: {target_identity_violations}")
 
     print("\nTarget statistics:")
     print(data[TARGET_COLUMN].describe().round(2))

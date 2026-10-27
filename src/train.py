@@ -18,7 +18,6 @@ from src.real_features import (
 )
 from src.train_real_models import build_random_forest_pipeline
 
-
 ARTIFACTS_DIR = Path("artifacts")
 MODEL_PATH = ARTIFACTS_DIR / "model.joblib"
 METRICS_PATH = ARTIFACTS_DIR / "metrics.json"
@@ -47,9 +46,7 @@ def main() -> None:
         ignore_index=True,
     )
 
-    X_development, y_development = select_features_and_target(
-        development_data
-    )
+    X_development, y_development = select_features_and_target(development_data)
     X_test, y_test = select_features_and_target(test_data)
 
     model = build_final_model()
@@ -74,9 +71,7 @@ def main() -> None:
         "target": TARGET_COLUMN,
         "test_metrics": {
             "mae": round(float(mean_absolute_error(y_test, predictions)), 2),
-            "rmse": round(
-                float(root_mean_squared_error(y_test, predictions)), 2
-            ),
+            "rmse": round(float(root_mean_squared_error(y_test, predictions)), 2),
             "r2": round(float(r2_score(y_test, predictions)), 4),
         },
     }

@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 DATA_PATH = Path("data/raw/hour.csv")
 
 VALIDATION_START = pd.Timestamp("2012-07-01 00:00:00")
@@ -36,13 +35,11 @@ def split_by_time(
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     train_mask = data["timestamp"] < VALIDATION_START
 
-    validation_mask = (
-        (data["timestamp"] >= VALIDATION_START)
-        & (data["timestamp"] < TEST_START)
+    validation_mask = (data["timestamp"] >= VALIDATION_START) & (
+        data["timestamp"] < TEST_START
     )
 
     test_mask = data["timestamp"] >= TEST_START
-
 
     train_data = data.loc[train_mask].copy()
     validation_data = data.loc[validation_mask].copy()
@@ -51,11 +48,7 @@ def split_by_time(
     if train_data.empty or validation_data.empty or test_data.empty:
         raise ValueError("Train, validation, and test must not be empty")
 
-    assigned_rows = (
-        len(train_data)
-        + len(validation_data)
-        + len(test_data)
-    )
+    assigned_rows = len(train_data) + len(validation_data) + len(test_data)
 
     if assigned_rows != len(data):
         raise ValueError("Some rows were not assigned to a data split")

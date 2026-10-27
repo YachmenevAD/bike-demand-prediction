@@ -15,7 +15,6 @@ from src.train_real_models import (
     build_random_forest_pipeline,
 )
 
-
 N_ESTIMATORS = 150
 MIN_SAMPLES_LEAF = 1
 MAX_DEPTH = None
@@ -56,9 +55,7 @@ def main() -> None:
         ignore_index=True,
     )
 
-    X_development, y_development = select_features_and_target(
-        development_data
-    )
+    X_development, y_development = select_features_and_target(development_data)
     X_test, y_test = select_features_and_target(test_data)
 
     tuned_random_forest = build_random_forest_pipeline()
@@ -92,8 +89,7 @@ def main() -> None:
     print(f"Development rows (train + validation): {len(X_development)}")
     print(f"Test rows: {len(X_test)}")
     print(
-        f"Test period: {test_data['timestamp'].min()} -> "
-        f"{test_data['timestamp'].max()}"
+        f"Test period: {test_data['timestamp'].min()} -> {test_data['timestamp'].max()}"
     )
     print("\nFinal test results:")
     print(results_table.round(2).to_string(index=False))

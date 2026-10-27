@@ -7,7 +7,6 @@ from sklearn.pipeline import Pipeline
 from src.real_features import FEATURE_COLUMNS
 from src.train import MODEL_PATH
 
-
 SAMPLE_MORNING_RUSH = {
     "season": 4,
     "mnth": 10,
@@ -42,8 +41,7 @@ SAMPLE_NIGHT_RAIN = {
 def load_model(model_path: Path = MODEL_PATH) -> Pipeline:
     if not model_path.exists():
         raise FileNotFoundError(
-            f"Trained model not found at {model_path}. "
-            "Run 'python -m src.train' first."
+            f"Trained model not found at {model_path}. Run 'python -m src.train' first."
         )
 
     return joblib.load(model_path)
@@ -53,13 +51,9 @@ def predict_demand(
     model: Pipeline,
     features: dict[str, int | float],
 ) -> float:
-    missing_features = sorted(
-        set(FEATURE_COLUMNS) - set(features.keys())
-    )
+    missing_features = sorted(set(FEATURE_COLUMNS) - set(features.keys()))
     if missing_features:
-        raise ValueError(
-            f"Missing required features: {missing_features}"
-        )
+        raise ValueError(f"Missing required features: {missing_features}")
 
     input_frame = pd.DataFrame([features])[FEATURE_COLUMNS]
     predictions = model.predict(input_frame)
@@ -81,10 +75,7 @@ def main() -> None:
         "Morning rush hour (08:00, clear weather, workday): "
         f"{morning_prediction:.1f} bikes"
     )
-    print(
-        "Night rain (03:00, light rain, workday): "
-        f"{night_prediction:.1f} bikes"
-    )
+    print(f"Night rain (03:00, light rain, workday): {night_prediction:.1f} bikes")
 
 
 if __name__ == "__main__":

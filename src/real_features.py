@@ -2,7 +2,6 @@ import pandas as pd
 
 from src.data import load_hourly_data, split_by_time
 
-
 CATEGORICAL_FEATURES = [
     "season",
     "mnth",
@@ -24,11 +23,7 @@ NUMERIC_FEATURES = [
     "windspeed",
 ]
 
-FEATURE_COLUMNS = (
-    CATEGORICAL_FEATURES
-    + BINARY_FEATURES
-    + NUMERIC_FEATURES
-)
+FEATURE_COLUMNS = CATEGORICAL_FEATURES + BINARY_FEATURES + NUMERIC_FEATURES
 
 TARGET_COLUMN = "cnt"
 
@@ -47,14 +42,10 @@ def select_features_and_target(
 ) -> tuple[pd.DataFrame, pd.Series]:
     required_columns = FEATURE_COLUMNS + [TARGET_COLUMN]
 
-    missing_columns = sorted(
-        set(required_columns) - set(data.columns)
-    )
+    missing_columns = sorted(set(required_columns) - set(data.columns))
 
     if missing_columns:
-        raise ValueError(
-            f"Required columns are missing: {missing_columns}"
-        )
+        raise ValueError(f"Required columns are missing: {missing_columns}")
 
     forbidden_columns_in_features = sorted(
         set(FEATURE_COLUMNS) & set(FORBIDDEN_FEATURES)
@@ -62,8 +53,7 @@ def select_features_and_target(
 
     if forbidden_columns_in_features:
         raise ValueError(
-            "Forbidden columns found in features: "
-            f"{forbidden_columns_in_features}"
+            f"Forbidden columns found in features: {forbidden_columns_in_features}"
         )
 
     X = data[FEATURE_COLUMNS].copy()
@@ -77,15 +67,11 @@ def main() -> None:
     train_data, validation_data, test_data = split_by_time(data)
 
     X_train, y_train = select_features_and_target(train_data)
-    X_validation, y_validation = select_features_and_target(
-        validation_data
-    )
+    X_validation, y_validation = select_features_and_target(validation_data)
     X_test, _ = select_features_and_target(test_data)
 
     same_feature_order = (
-        list(X_train.columns)
-        == list(X_validation.columns)
-        == list(X_test.columns)
+        list(X_train.columns) == list(X_validation.columns) == list(X_test.columns)
     )
 
     print("Feature groups:")

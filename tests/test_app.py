@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sklearn.pipeline import Pipeline
 
 from src.api import app
-from src.data import TEST_START, VALIDATION_START, split_by_time
+from src.data import split_by_time
 from src.predict import SAMPLE_MORNING_RUSH, predict_demand
 from src.real_features import (
     FEATURE_COLUMNS,

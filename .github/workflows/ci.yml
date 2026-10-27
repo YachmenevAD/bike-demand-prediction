@@ -27,6 +27,14 @@ jobs:
           python -m pip install --upgrade "pip==26.2.2"
           python -m pip install -r requirements-dev.txt
 
+      - name: Lint Python code
+        run: |
+          ruff check .
+
+      - name: Check Python formatting
+        run: |
+          ruff format --check .
+
       - name: Run tests with pytest
         run: |
           pytest -v

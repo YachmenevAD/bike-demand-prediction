@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 DATA_PATH = "data/sample/bike_rentals.csv"
 
 

@@ -3,18 +3,17 @@ from typing import Any
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.ensemble import RandomForestRegressor
 
 from src.data import load_hourly_data, split_by_time
 from src.real_features import (
     BINARY_FEATURES,
     CATEGORICAL_FEATURES,
     NUMERIC_FEATURES,
-    TARGET_COLUMN,
     select_features_and_target,
 )
 
@@ -112,9 +111,7 @@ def main() -> None:
     train_data, validation_data, _ = split_by_time(data)
 
     X_train, y_train = select_features_and_target(train_data)
-    X_validation, y_validation = select_features_and_target(
-        validation_data
-    )
+    X_validation, y_validation = select_features_and_target(validation_data)
 
     dummy_model = DummyRegressor(strategy="mean")
     linear_pipeline = build_linear_pipeline()
@@ -156,11 +153,8 @@ def main() -> None:
         f"({improvement_percent:.1f}%)"
     )
 
-
     random_forest_improvement = dummy_mae - random_forest_mae
-    random_forest_improvement_percent = (
-        random_forest_improvement / dummy_mae * 100
-    )
+    random_forest_improvement_percent = random_forest_improvement / dummy_mae * 100
 
     print(
         "Random forest improvement over baseline: "

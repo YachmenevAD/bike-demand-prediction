@@ -7,7 +7,6 @@ from src.data import TEST_START, load_hourly_data
 from src.real_features import select_features_and_target
 from src.train_real_models import build_random_forest_pipeline
 
-
 N_SPLITS = 3
 VALIDATION_WINDOW_SIZE = 24 * 30
 N_ESTIMATORS = 150
@@ -23,9 +22,7 @@ CANDIDATES: list[tuple[str, int, int | None]] = [
 def main() -> None:
     data = load_hourly_data()
 
-    development_data = data.loc[
-        data["timestamp"] < TEST_START
-    ].copy()
+    development_data = data.loc[data["timestamp"] < TEST_START].copy()
     development_data = development_data.reset_index(drop=True)
 
     X, y = select_features_and_target(development_data)
@@ -64,12 +61,9 @@ def main() -> None:
                 model__min_samples_leaf=min_samples_leaf,
                 model__max_depth=max_depth,
             )
-            model.fit(X_fold_train,y_fold_train)
+            model.fit(X_fold_train, y_fold_train)
             predictions = model.predict(X_fold_validation)
-            fold_mae = mean_absolute_error(
-                y_fold_validation,
-                predictions
-            )
+            fold_mae = mean_absolute_error(y_fold_validation, predictions)
 
             fold_scores.append(float(fold_mae))
             print(f"Fold {fold_number} MAE: {fold_mae:.2f}")
@@ -79,10 +73,7 @@ def main() -> None:
 
         results[candidate_name] = (mean_mae, std_mae)
 
-        print(
-            f"Summary: mean MAE = {mean_mae:.2f}, "
-            f"std = {std_mae:.2f}"
-        )
+        print(f"Summary: mean MAE = {mean_mae:.2f}, std = {std_mae:.2f}")
 
     ranked_results = sorted(
         results.items(),

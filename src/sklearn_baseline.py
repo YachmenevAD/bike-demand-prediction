@@ -8,7 +8,6 @@ from src.features import (
     add_time_features,
 )
 
-
 DATA_PATH = "data/sample/bike_rentals.csv"
 VALIDATION_START = pd.Timestamp("2024-01-02 00:00:00")
 
@@ -22,12 +21,8 @@ def main() -> None:
     data = data.sort_values("timestamp")
     featured_data = add_time_features(data)
 
-    train_data = featured_data.loc[
-        featured_data["timestamp"] < VALIDATION_START
-    ]
-    validation_data = featured_data.loc[
-        featured_data["timestamp"] >= VALIDATION_START
-    ]
+    train_data = featured_data.loc[featured_data["timestamp"] < VALIDATION_START]
+    validation_data = featured_data.loc[featured_data["timestamp"] >= VALIDATION_START]
 
     if train_data.empty or validation_data.empty:
         raise ValueError("Train and validation datasets must not be empty")
