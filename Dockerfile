@@ -1,5 +1,7 @@
 FROM python:3.12-slim
 
+ARG PIP_VERSION=26.2.2
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
@@ -8,7 +10,7 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN python -m pip install --upgrade pip \
+RUN python -m pip install --upgrade "pip==${PIP_VERSION}" \
     && python -m pip install -r requirements.txt
 
 RUN useradd --create-home appuser \
