@@ -7,7 +7,6 @@ from sklearn.pipeline import Pipeline
 
 from src.predict import SAMPLE_MORNING_RUSH, load_model, predict_demand
 
-
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
