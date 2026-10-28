@@ -87,12 +87,40 @@ def test_predict_demand_returns_non_negative_float(
     assert prediction >= 0.0
 
 
-def test_health_endpoint() -> None:
+def test_liveness_endpoint() -> None:
     client = TestClient(app)
-    response = client.get("/health")
+    response = client.get("/health/live")
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+
+
+def test_readiness_endpoint_reports_model_state(
+    trained_mini_model: Pipeline,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = TestClient(app)
+
+    monkeypatch.setattr(
+        "src.api.get_model",
+        lambda: trained_mini_model,
+    )
+    ready_response = client.get("/health/ready")
+
+    assert ready_response.status_code == 200
+    assert ready_response.json() == {"status": "ready"}
+
+    def unavailable_model() -> Pipeline:
+        raise FileNotFoundError("Model artifact is missing")
+
+    monkeypatch.setattr(
+        "src.api.get_model",
+        unavailable_model,
+    )
+    unavailable_response = client.get("/health/ready")
+
+    assert unavailable_response.status_code == 503
+    assert unavailable_response.json() == {"detail": "Model is not ready"}
 
 
 def test_predict_endpoint_valid_and_invalid_input(

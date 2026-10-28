@@ -1,10 +1,14 @@
+import logging
 from functools import lru_cache
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from sklearn.pipeline import Pipeline
 
 from src.predict import SAMPLE_MORNING_RUSH, load_model, predict_demand
+
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Bike Demand Prediction API",
@@ -47,9 +51,23 @@ def get_model() -> Pipeline:
     return load_model()
 
 
-@app.get("/health")
-def health_check() -> dict[str, str]:
+@app.get("/health/live")
+def liveness_check() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/health/ready")
+def readiness_check() -> dict[str, str]:
+    try:
+        get_model()
+    except Exception as error:
+        logger.exception("Model readiness check failed")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Model is not ready",
+        ) from error
+
+    return {"status": "ready"}
 
 
 @app.post("/predict", response_model=BikeDemandResponse)
