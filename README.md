@@ -5,6 +5,9 @@
 An end-to-end machine learning project for predicting hourly bike rental
 demand and serving predictions through a production-oriented REST API.
 
+Detailed model assumptions, intended use, and limitations are documented in
+the [Model Card](MODEL_CARD.md).
+
 ## Overview
 
 The project uses the
