@@ -39,32 +39,32 @@ jobs:
         run: |
           pytest -v
 
-docker-build:
-    name: Build production Docker image
-    needs: test
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  docker-build:
+      name: Build production Docker image
+      needs: test
+      runs-on: ubuntu-latest
+      timeout-minutes: 10
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: |
-          docker build --tag bike-demand-api:ci .
+        - name: Build Docker image
+          run: |
+            docker build --tag bike-demand-api:ci .
 
-      - name: Check runtime imports
-        run: |
-          docker run --rm bike-demand-api:ci \
-            python -c "import pandas, sklearn, fastapi, joblib, pydantic; print('Runtime imports: OK')"
+        - name: Check runtime imports
+          run: |
+            docker run --rm bike-demand-api:ci \
+              python -c "import pandas, sklearn, fastapi, joblib, pydantic; print('Runtime imports: OK')"
 
-      - name: Check that development tools are excluded
-        run: |
-          docker run --rm bike-demand-api:ci sh -c '
-            if python -m pip show pytest >/dev/null 2>&1; then
-              echo "pytest must not be installed in the production image"
-              exit 1
-            else
-              echo "pytest is not installed: OK"
-            fi
-          '
+        - name: Check that development tools are excluded
+          run: |
+            docker run --rm bike-demand-api:ci sh -c '
+              if python -m pip show pytest >/dev/null 2>&1; then
+                echo "pytest must not be installed in the production image"
+                exit 1
+              else
+                echo "pytest is not installed: OK"
+              fi
+            '
