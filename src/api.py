@@ -35,9 +35,10 @@ class BikeDemandRequest(BaseModel):
     windspeed: float = Field(..., ge=0.0, le=1.0, description="Normalized wind speed")
 
     model_config = {
+        "extra": "forbid",
         "json_schema_extra": {
             "examples": [SAMPLE_MORNING_RUSH],
-        }
+        },
     }
 
 
@@ -50,6 +51,17 @@ def get_model() -> Pipeline:
     return load_model()
 
 
+def get_ready_model() -> Pipeline:
+    try:
+        return get_model()
+    except Exception as error:
+        logger.exception("Model loading failed")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Model is not ready",
+        ) from error
+
+
 @app.get("/health/live")
 def liveness_check() -> dict[str, str]:
     return {"status": "ok"}
@@ -57,21 +69,13 @@ def liveness_check() -> dict[str, str]:
 
 @app.get("/health/ready")
 def readiness_check() -> dict[str, str]:
-    try:
-        get_model()
-    except Exception as error:
-        logger.exception("Model readiness check failed")
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Model is not ready",
-        ) from error
-
+    get_ready_model()
     return {"status": "ready"}
 
 
 @app.post("/predict", response_model=BikeDemandResponse)
 def predict(request: BikeDemandRequest) -> BikeDemandResponse:
-    model = get_model()
+    model = get_ready_model()
     features = request.model_dump()
     prediction = predict_demand(model, features)
 

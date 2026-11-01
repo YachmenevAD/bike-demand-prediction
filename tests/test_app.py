@@ -138,3 +138,39 @@ def test_predict_endpoint_valid_and_invalid_input(
     invalid_payload["hr"] = 99
     invalid_response = client.post("/predict", json=invalid_payload)
     assert invalid_response.status_code == 422
+
+
+def test_predict_endpoint_rejects_extra_fields() -> None:
+    client = TestClient(app)
+
+    payload_with_extra_field = dict(SAMPLE_MORNING_RUSH)
+    payload_with_extra_field["unknown_feature"] = 123
+
+    response = client.post(
+        "/predict",
+        json=payload_with_extra_field,
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["type"] == "extra_forbidden"
+
+
+def test_predict_endpoint_returns_503_when_model_is_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unavailable_model() -> Pipeline:
+        raise FileNotFoundError("Model artifact is missing")
+
+    monkeypatch.setattr(
+        "src.api.get_model",
+        unavailable_model,
+    )
+
+    client = TestClient(app)
+    response = client.post(
+        "/predict",
+        json=SAMPLE_MORNING_RUSH,
+    )
+
+    assert response.status_code == 503
+    assert response.json() == {"detail": "Model is not ready"}
